@@ -1399,6 +1399,16 @@ footer > .container {
   list-style: lower-roman;
 }
 
+.reading-time-area {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.reading-time-info {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 .article-page .article-actions {
   text-align: center;
   margin-top: 1.5rem;
