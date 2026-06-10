@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import getArticle from "../../services/getArticle";
 import readingTimeCalculator from "../../helpers/readingTimeCalculator";
 import wordCounter from "../../helpers/wordCounter";
+import characterCounter from "../../helpers/characterCounter";
 
 function Article() {
   const { state } = useLocation();
@@ -39,6 +40,7 @@ function Article() {
     const timer = setTimeout(() => {
       setReadingInfo({
         wordCount: wordCounter(body),
+        charCount: characterCounter(body),
         readingTime: readingTimeCalculator(body),
       });
     }, 0);
@@ -61,7 +63,7 @@ function Article() {
             {readingInfo && (
               <div className="reading-time-area">
                 <span className="reading-time-info">
-                  {readingInfo.wordCount} words · {readingInfo.readingTime}
+                  {readingInfo.charCount} characters · {readingInfo.readingTime}
                 </span>
               </div>
             )}
