@@ -4,6 +4,7 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import ArticleMeta from "../../components/ArticleMeta";
 import ArticlesButtons from "../../components/ArticlesButtons";
 import ArticleTags from "../../components/ArticleTags";
+import ArticleLanguage from "../../components/ArticleLanguage";
 import BannerContainer from "../../components/BannerContainer";
 import { useAuth } from "../../context/AuthContext";
 import getArticle from "../../services/getArticle";
@@ -42,7 +43,7 @@ function Article() {
   const [article, setArticle] = useState(state || {});
   const [currentLang, setCurrentLang] = useState("zh");
   const [loading, setLoading] = useState(false);
-  const { title, body, tagList, createdAt, author, has_en_version, coverImage } =
+  const { title, body, tagList, createdAt, author, has_en_version, coverImage, language } =
     article || {};
   const { headers, isAuth } = useAuth();
   const navigate = useNavigate();
@@ -138,6 +139,10 @@ function Article() {
             </button>
           </div>
         )}
+
+        <div className="article-language-area">
+          <ArticleLanguage language={language || currentLang} />
+        </div>
 
         <hr />
 

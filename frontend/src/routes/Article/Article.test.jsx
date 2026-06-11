@@ -113,6 +113,28 @@ describe("Article - Language Toggle", () => {
   });
 });
 
+describe("Article - Language Display", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("renders language info at bottom of article page", async () => {
+    renderArticle(mockArticleZh);
+
+    await waitFor(() => {
+      expect(screen.getByText("中文")).toBeInTheDocument();
+    });
+  });
+
+  test("renders English language info for English articles", async () => {
+    renderArticle(mockArticleEn);
+
+    await waitFor(() => {
+      expect(screen.getByText("English")).toBeInTheDocument();
+    });
+  });
+});
+
 describe("Article - Cover Image", () => {
   test("renders cover image when article has coverImage", async () => {
     const articleWithCover = {
