@@ -54,6 +54,18 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       description: DataTypes.TEXT,
       body: DataTypes.TEXT,
+      title_en: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      content_en: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      summary_en: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
       coverImage: {
         type: DataTypes.STRING(2048),
         allowNull: true,

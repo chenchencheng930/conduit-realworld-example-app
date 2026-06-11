@@ -7,11 +7,11 @@ import FormFieldset from "../FormFieldset";
 
 const COVER_URL_REGEX = /^https?:\/\/.{1,2045}$/;
 
-const emptyForm = { title: "", description: "", body: "", tagList: "", coverImage: "" };
+const emptyForm = { title: "", description: "", body: "", tagList: "", coverImage: "", title_en: "", content_en: "", summary_en: "" };
 
 function ArticleEditorForm() {
   const { state } = useLocation();
-  const [{ title, description, body, tagList, coverImage }, setForm] = useState(
+  const [{ title, description, body, tagList, coverImage, title_en, content_en, summary_en }, setForm] = useState(
     state || emptyForm,
   );
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,10 +29,10 @@ function ArticleEditorForm() {
     if (state || !slug) return;
 
     getArticle({ headers, slug })
-      .then(({ author: { username }, body, coverImage, description, tagList, title }) => {
+      .then(({ author: { username }, body, coverImage, description, tagList, title, title_en, content_en, summary_en }) => {
         if (username !== loggedUser.username) redirect();
 
-        setForm({ body, coverImage: coverImage || "", description, tagList, title });
+        setForm({ body, coverImage: coverImage || "", description, tagList, title, title_en: title_en || "", content_en: content_en || "", summary_en: summary_en || "" });
       })
       .catch(console.error);
 
@@ -62,7 +62,7 @@ function ArticleEditorForm() {
   const formSubmit = (e) => {
     e.preventDefault();
 
-    setArticle({ headers, slug, body, description, tagList, title, coverImage })
+    setArticle({ headers, slug, body, description, tagList, title, coverImage, title_en, content_en, summary_en })
       .then((slug) => navigate(`/article/${slug}`))
       .catch(setErrorMessage);
   };
@@ -113,6 +113,36 @@ function ArticleEditorForm() {
               URL must start with http:// or https:// and be at most 2048 characters
             </span>
           )}
+        </fieldset>
+
+        <fieldset className="form-group">
+          <h5>English Version</h5>
+          <input
+            className="form-control"
+            placeholder="English Title"
+            name="title_en"
+            value={title_en}
+            onChange={inputHandler}
+          />
+        </fieldset>
+
+        <FormFieldset
+          normal
+          placeholder="English Summary"
+          name="summary_en"
+          value={summary_en}
+          handler={inputHandler}
+        ></FormFieldset>
+
+        <fieldset className="form-group">
+          <textarea
+            className="form-control"
+            rows="8"
+            placeholder="Write your article in English (in markdown)"
+            name="content_en"
+            value={content_en}
+            onChange={inputHandler}
+          ></textarea>
         </fieldset>
 
         <FormFieldset

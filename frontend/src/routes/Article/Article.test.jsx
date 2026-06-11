@@ -3,6 +3,7 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, useParams } from "react-router-dom";
 import Article from "./Article";
 import getArticle from "../../services/getArticle";
+import { I18nProvider } from "../../context/I18nContext";
 
 vi.mock("../../services/getArticle", () => ({
   default: vi.fn(),
@@ -33,8 +34,10 @@ const mockArticleZh = {
   createdAt: "2024-01-01",
   author: { username: "author", image: "", following: false },
   language: "zh",
-  has_en_version: true,
-  relatedArticleId: 2,
+  availableLanguages: ["zh", "en"],
+  title_en: "English Title",
+  content_en: "English content",
+  summary_en: "English description",
 };
 
 const mockArticleEn = {
@@ -46,14 +49,19 @@ const mockArticleEn = {
   createdAt: "2024-01-01",
   author: { username: "author", image: "", following: false },
   language: "en",
-  has_en_version: false,
+  availableLanguages: ["zh", "en"],
+  title_en: "English Title",
+  content_en: "English content",
+  summary_en: "English description",
 };
 
 const renderArticle = (state) => {
   useParams.mockReturnValue({ slug: "test-article" });
   return render(
     <MemoryRouter initialEntries={[{ state }]}>
-      <Article />
+      <I18nProvider>
+        <Article />
+      </I18nProvider>
     </MemoryRouter>,
   );
 };
@@ -61,49 +69,42 @@ const renderArticle = (state) => {
 describe("Article - Language Toggle", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
-  test("shows English button when article has English version", async () => {
+  test("shows English version button when article has English version", async () => {
     renderArticle(mockArticleZh);
 
     await waitFor(() => {
-      expect(screen.getByText("English")).toBeInTheDocument();
+      expect(screen.getByText("英文版")).toBeInTheDocument();
     });
   });
 
   test("does not show language toggle when article has no English version", async () => {
-    const articleNoEn = { ...mockArticleZh, has_en_version: false };
+    const articleNoEn = { ...mockArticleZh, availableLanguages: ["zh"] };
     renderArticle(articleNoEn);
 
     await waitFor(() => {
-      expect(screen.queryByText("English")).not.toBeInTheDocument();
+      expect(screen.queryByText("英文版")).not.toBeInTheDocument();
     });
   });
 
-  test("toggles to Chinese button after clicking English", async () => {
+  test("toggles to Chinese button after clicking English version", async () => {
     getArticle.mockResolvedValue(mockArticleEn);
     renderArticle(mockArticleZh);
 
-    await waitFor(() => {
-      expect(screen.getByText("English")).toBeInTheDocument();
-    });
+    const englishBtn = await screen.findByText("英文版");
+    fireEvent.click(englishBtn);
 
-    fireEvent.click(screen.getByText("English"));
-
-    await waitFor(() => {
-      expect(screen.getByText("中文")).toBeInTheDocument();
-    });
+    expect(await screen.findByText("中文")).toBeInTheDocument();
   });
 
   test("calls getArticle with lang=en when toggling", async () => {
     getArticle.mockResolvedValue(mockArticleEn);
     renderArticle(mockArticleZh);
 
-    await waitFor(() => {
-      expect(screen.getByText("English")).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("English"));
+    const englishBtn = await screen.findByText("英文版");
+    fireEvent.click(englishBtn);
 
     await waitFor(() => {
       expect(getArticle).toHaveBeenCalledWith(
@@ -116,6 +117,7 @@ describe("Article - Language Toggle", () => {
 describe("Article - Language Display", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   test("renders language info at bottom of article page", async () => {

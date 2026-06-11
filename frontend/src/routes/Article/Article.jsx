@@ -7,6 +7,8 @@ import ArticleTags from "../../components/ArticleTags";
 import ArticleLanguage from "../../components/ArticleLanguage";
 import BannerContainer from "../../components/BannerContainer";
 import { useAuth } from "../../context/AuthContext";
+import { useI18n } from "../../context/I18nContext";
+import useTranslation from "../../hooks/useTranslation";
 import getArticle from "../../services/getArticle";
 import readingTimeCalculator from "../../helpers/readingTimeCalculator";
 import wordCounter from "../../helpers/wordCounter";
@@ -41,15 +43,19 @@ function ArticleCoverImage({ coverImage }) {
 function Article() {
   const { state } = useLocation();
   const [article, setArticle] = useState(state || {});
-  const [currentLang, setCurrentLang] = useState("zh");
   const [loading, setLoading] = useState(false);
-  const { title, body, tagList, createdAt, author, has_en_version, coverImage, language } =
+  const { title, body, tagList, createdAt, author, availableLanguages, coverImage, language } =
     article || {};
   const { headers, isAuth } = useAuth();
+  const { setLanguage } = useI18n();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { slug } = useParams();
 
   const [readingInfo, setReadingInfo] = useState(null);
+
+  const currentLang = language || "zh";
+  const hasEnVersion = availableLanguages?.includes("en");
 
   useEffect(() => {
     if (state) return;
@@ -58,14 +64,14 @@ function Article() {
     getArticle({ slug, headers })
       .then((data) => {
         setArticle(data);
-        setCurrentLang(data.language || "zh");
+        if (data.language) setLanguage(data.language);
       })
       .catch((error) => {
         console.error(error);
         navigate("/not-found", { replace: true });
       })
       .finally(() => setLoading(false));
-  }, [isAuth, slug, headers, state, navigate]);
+  }, [isAuth, slug, headers, state, navigate, setLanguage]);
 
   useEffect(() => {
     if (!body) {
@@ -85,10 +91,10 @@ function Article() {
   const toggleLanguage = () => {
     const targetLang = currentLang === "zh" ? "en" : "zh";
     setLoading(true);
+    setLanguage(targetLang);
     getArticle({ slug, headers, lang: targetLang })
       .then((data) => {
         setArticle(data);
-        setCurrentLang(targetLang);
       })
       .catch((error) => {
         console.error(error);
@@ -111,7 +117,7 @@ function Article() {
           <div className="col-md-12">
             {loading && (
               <div className="language-toggle-area">
-                <span className="language-toggle-loading">Loading...</span>
+                <span className="language-toggle-loading">{t("common.loading")}</span>
               </div>
             )}
             {body && !loading && (
@@ -120,7 +126,7 @@ function Article() {
             {readingInfo && (
               <div className="reading-time-area">
                 <span className="reading-time-info">
-                  {readingInfo.charCount} characters · {readingInfo.readingTime}
+                  {readingInfo.charCount} {t("article.characters")} · {readingInfo.readingTime}
                 </span>
               </div>
             )}
@@ -128,20 +134,20 @@ function Article() {
           </div>
         </div>
 
-        {(has_en_version || currentLang === "en") && (
+        {hasEnVersion && (
           <div className="language-toggle-area">
             <button
               className="btn btn-sm btn-outline-primary language-toggle-btn"
               onClick={toggleLanguage}
               disabled={loading}
             >
-              {currentLang === "zh" ? "English" : "中文"}
+              {currentLang === "zh" ? t("article.english_version") : t("article.chinese_version")}
             </button>
           </div>
         )}
 
         <div className="article-language-area">
-          <ArticleLanguage language={language || currentLang} />
+          <ArticleLanguage language={currentLang} />
         </div>
 
         <hr />
