@@ -158,6 +158,14 @@ const articlesFeed = async (req, res, next) => {
   }
 };
 
+// Helper to count words (strips HTML, counts Chinese chars + English words)
+function countWords(text) {
+  if (!text) return 0;
+  const stripped = text.replace(/<[^>]*>/g, "");
+  const matches = stripped.match(/[\u4e00-\u9fff\uf900-\ufaff]|\b[a-zA-Z]+(?:'[a-zA-Z]+)?\b/g);
+  return matches ? matches.length : 0;
+}
+
 // Single Article by slug
 const singleArticle = async (req, res, next) => {
   try {
@@ -196,6 +204,7 @@ const singleArticle = async (req, res, next) => {
 
     article.dataValues.has_en_version = hasEnVersion;
     article.dataValues.availableLanguages = availableLanguages;
+    article.dataValues.wordCount = countWords(article.body);
 
     res.json({ article });
   } catch (error) {

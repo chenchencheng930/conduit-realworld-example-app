@@ -35,3 +35,27 @@ it("should handle single word", () => {
 it("should handle text with newlines", () => {
   expect(wordCounter("hello\nworld\nfoo bar")).toBe(4);
 });
+
+it("should count Chinese characters", () => {
+  expect(wordCounter("这是一段中文")).toBe(6);
+});
+
+it("should count mixed Chinese and English", () => {
+  expect(wordCounter("hello 世界 goodbye 世界")).toBe(6);
+});
+
+it("should ignore HTML tags when counting Chinese", () => {
+  expect(wordCounter("<p>这是一段中文</p>")).toBe(6);
+});
+
+it("should ignore HTML tags when counting English", () => {
+  expect(wordCounter("<p>hello world</p>")).toBe(2);
+});
+
+it("should count Chinese with punctuation and HTML", () => {
+  expect(wordCounter("<p>你好，世界！</p>")).toBe(4);
+});
+
+it("should return 0 for text with only HTML tags", () => {
+  expect(wordCounter("<p><b><i></i></b></p>")).toBe(0);
+});

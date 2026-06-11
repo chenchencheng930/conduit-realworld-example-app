@@ -2,6 +2,7 @@
   "article.publish_time": "Published",
   "article.author": "Author",
   "article.reading_time": "Reading time",
+  "article.word_count": "words",
   "article.characters": "characters",
   "article.min_read": "min read",
   "article.cover": "Cover Image",
