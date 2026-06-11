@@ -126,7 +126,7 @@ function Article() {
             {readingInfo && (
               <div className="reading-time-area">
                 <span className="reading-time-info">
-                  {readingInfo.charCount} {t("article.characters")} · {readingInfo.readingTime}
+                  {readingInfo.wordCount} {t("article.word_count")} · {readingInfo.charCount} {t("article.characters")} · {readingInfo.readingTime}
                 </span>
               </div>
             )}

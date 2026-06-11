@@ -137,6 +137,29 @@ describe("Article - Language Display", () => {
   });
 });
 
+describe("Article - Word Count", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  test("renders word count for Chinese article", async () => {
+    renderArticle(mockArticleZh);
+
+    await waitFor(() => {
+      expect(screen.getByText(/^4\s*字/)).toBeInTheDocument();
+    });
+  });
+
+  test("renders word count for English article (with default zh locale)", async () => {
+    renderArticle(mockArticleEn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/^2\s*字/)).toBeInTheDocument();
+    });
+  });
+});
+
 describe("Article - Cover Image", () => {
   test("renders cover image when article has coverImage", async () => {
     const articleWithCover = {
